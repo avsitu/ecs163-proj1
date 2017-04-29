@@ -18,16 +18,24 @@
 </head>
 
 <body>
+	<div style="margin-bottom:10px">Employee Leave Rate Per Department</div>
   <div class="chart"></div>
+  <div>There is a clear difference in leave rate between departments. Employees in human resources are twice as likely to leave as those in management.</div>
   <script src="js/d3.min.js"></script>
-  <script>
-  	var data = [4, 8, 15, 16, 23, 42];
+<script>
+	d3.csv("ecs163_proj1.csv", type, function(data) {
+  	console.log(data);
 	d3.select(".chart")
 	  .selectAll("div")
 	    .data(data)
 	  .enter().append("div")
-	    .style("width", function(d) { return d * 10 + "px"; })
-	    .text(function(d) { return d; });
-	</script>
+	    .style("width", function(d) { return d.Leave_rate * 1000 + "px"; })
+	    .text(function(d) { return d.Department+': '+d.Leave_rate; });
+	});    
+	function type(d) {
+	  d.value = +d.value; // coerce to number
+	  return d;
+	}
+</script>
 </body>
 </html>
