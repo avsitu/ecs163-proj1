@@ -6,7 +6,7 @@
   <title>Project 1</title>
   <style>
 	.chart div {
-	  font: 10px sans-serif;
+	  font: 15px sans-serif;
 	  background-color: steelblue;
 	  text-align: right;
 	  padding: 3px;
@@ -24,16 +24,16 @@
   <script src="js/d3.min.js"></script>
 <script>
 	d3.csv("ecs163_proj1.csv", type, function(data) {
-  	console.log(data);
+  	// console.log(data);
 	d3.select(".chart")
 	  .selectAll("div")
 	    .data(data)
 	  .enter().append("div")
-	    .style("width", function(d) { return d.Leave_rate * 1000 + "px"; })
-	    .text(function(d) { return d.Department+': '+d.Leave_rate; });
+	    .style("width", function(d) { return d.Leave_rate * 2000 + "px"; })
+	    .text(function(d) { return d.Department+': ' + (d.Leave_rate).toFixed(3); });
 	});    
 	function type(d) {
-	  d.value = +d.value; // coerce to number
+	  d.Leave_rate = +d.Leave_rate; // coerce to number
 	  return d;
 	}
 </script>
