@@ -1,0 +1,11 @@
+Department,Count_left,Count_stayed,Leave_rate
+Management,91,539,0.144444444
+R and D,121,666,0.153748412
+Product Mng,198,704,0.219512195
+IT,273,954,0.222493888
+Marketing,203,655,0.236596737
+Sales,"1,014","3,126",0.244927536
+Support,555,"1,674",0.248990579
+Technical,697,"2,023",0.25625
+Accounting,204,563,0.265971317
+HR,215,524,0.290933694
