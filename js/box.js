@@ -10,11 +10,11 @@ d3.box = function() {
       whiskers = boxWhiskers,
       quartiles = boxQuartiles,
       tickFormat = null;
-
   // For each small multiple…
   function box(g) {
     g.each(function(d, i) {
-      d = d.slice(1)
+      // console.log(d)
+      d = d.slice(2);
       d = d.map(value).sort(d3.ascending);
       var g = d3.select(this),
           n = d.length,
@@ -83,11 +83,11 @@ d3.box = function() {
           .remove();
 
       // Update innerquartile box.
-      var box = g.selectAll("rect.box")
+      var box = g.selectAll("rect.iqbox")
           .data([quartileData]);
 
       box.enter().append("rect")
-          .attr("class", "box")
+          .attr("class", "iqbox")
           .attr("x", 0)
           .attr("y", function(d) { return x0(d[2]); })
           .attr("width", width)
@@ -183,7 +183,7 @@ d3.box = function() {
 
       // Update box ticks.
       var boxTick = g.selectAll("text.box")
-          .data(quartileData);
+          .data(quartileData.slice(0,3));
 
       boxTick.enter().append("text")
           .attr("class", "box")
@@ -205,11 +205,11 @@ d3.box = function() {
       // Update whisker ticks. These are handled separately from the box
       // ticks because they may or may not exist, and we want don't want
       // to join box ticks pre-transition with whisker ticks post-.
-      var whiskerTick = g.selectAll("text.whisker")
+      var whiskerTick = g.selectAll("text.twhisker")
           .data(whiskerData || []);
 
       whiskerTick.enter().append("text")
-          .attr("class", "whisker")
+          .attr("class", "twhisker")
           .attr("dy", ".3em")
           .attr("dx", 6)
           .attr("x", width)
@@ -277,6 +277,12 @@ d3.box = function() {
     whiskers = x;
     return box;
   };
+
+  box.color = function(x) {
+    if (!arguments.length) return color;
+    color = x;
+    return box;
+  };  
 
   box.quartiles = function(x) {
     if (!arguments.length) return quartiles;
