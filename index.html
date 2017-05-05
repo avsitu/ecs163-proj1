@@ -30,6 +30,60 @@
 		margin-left: 20%;
 		margin-right: 20%;
 	}
+
+svg {
+  font: 14px sans-serif;
+  margin: 50px;
+}
+
+.background path {
+  fill: none;
+  stroke: #ccc;
+  stroke-opacity: .4;
+  shape-rendering: crispEdges;
+}
+
+.foreground path {
+  fill: none;
+  /*stroke: steelblue;*/
+  stroke-opacity: .7;
+  stroke-width: 1.5;
+}
+
+.axis text {
+  text-shadow: 0 1px 0 #fff;
+  cursor: move;
+  -webkit-text-stroke: 1px #fff;
+   color: black;
+   text-shadow:
+       2px 2px 0 #fff,
+     -2px -2px 0 #fff,  
+      2px -2px 0 #fff,
+      -2px 2px 0 #fff,
+       2px 2px 0 #fff;
+}	
+
+.box {
+  font: 10px sans-serif;
+  display: inline;
+}
+
+.box line,
+.box rect,
+.box circle {
+  fill: #fff;
+  stroke: #000;
+  stroke-width: 1.5px;
+}
+
+.box .center {
+  stroke-dasharray: 3,3;
+}
+
+.box .outlier {
+  fill: none;
+  stroke: #ccc;
+}
   </style>
 
 </head>
@@ -39,23 +93,26 @@
 	<svg class="chart"></svg>
 	<p>There is a clear difference in leave rate between departments. Employees in human resources are twice as likely to leave as those in management.</p>
 	<svg class="chart2"></svg>
+	<svg class='pc'></svg>
+	<svg class='box1'></svg>
 	<script src="js/d3.min.js"></script>
+	<script src="js/box.js"></script>
 	<script>
-		var margin = {top: 20, right: 30, bottom: 30, left: 40},
-		    width = 960 - margin.left - margin.right,
-		    height = 500 - margin.top - margin.bottom;
-		var x = d3.scaleBand()
-		    .range([0, width]).padding(0.1);		    
-
-		var y = d3.scaleLinear()
-		    .range([height, 0]);
-
-		var chart = d3.select(".chart")
-		    .attr("width", width + margin.left + margin.right)
-		    .attr("height", height + margin.top + margin.bottom).append("g")
-    		.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
 		d3.csv("data/graph1.csv", type1, function(data) {
+			var margin = {top: 20, right: 30, bottom: 30, left: 40},
+			    width = 960 - margin.left - margin.right,
+			    height = 500 - margin.top - margin.bottom;
+			var x = d3.scaleBand()
+			    .range([0, width]).padding(0.1);		    
+
+			var y = d3.scaleLinear()
+			    .range([height, 0]);
+
+			var chart = d3.select(".chart")
+			    .attr("width", width + margin.left + margin.right)
+			    .attr("height", height + margin.top + margin.bottom).append("g")
+	    		.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
 			x.domain(data.map(function(d) { return d.Department; }));
 
   			y.domain([0, d3.max(data, function(d) { return d.Leave_rate; })]);
@@ -92,16 +149,20 @@
 			return d;
 		};
 
-		var x = d3.scaleBand()
-		    .range([0, width]).padding(0.1);		    
-
-		var y = d3.scaleLinear()
-		    .range([height, 0]);
-		var chart2 = d3.select(".chart2")
-		    .attr("width", width + margin.left + margin.right)
-		    .attr("height", height + margin.top + margin.bottom).append("g")
-    		.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 		d3.csv("data/graph2.csv", type2, function(data) {	
+			var margin = {top: 20, right: 30, bottom: 30, left: 40},
+			    width = 960 - margin.left - margin.right,
+			    height = 500 - margin.top - margin.bottom;			
+			var x = d3.scaleBand()
+			    .range([0, width]).padding(0.1);		    
+
+			var y = d3.scaleLinear()
+			    .range([height, 0]);
+
+			var chart2 = d3.select(".chart2")
+			    .attr("width", width + margin.left + margin.right)
+			    .attr("height", height + margin.top + margin.bottom).append("g")
+	    		.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 			x.domain(data.map(function(d) { return d.AMH; }));
 
   			y.domain([0, d3.max(data, function(d) { return d.Count_stayed+d.Count_left; })]);
@@ -152,7 +213,190 @@
 			d.Count_stayed = +d.Count_stayed;
 			d.Count_left = +d.Count_left;
 			return d;
-		};		
-	</script>
+		};	
+</script>		
+
+<script>
+	var m = [30, 40, 30, 40],
+	  w = 1500 - m[1] - m[3],
+	  h = 600 - m[0] - m[2];
+	var line = d3.line();
+	var dragging = {};
+	var x2 = d3.scaleBand().range([0, w]);
+	var y2 = {};
+	d3.csv("data/graph3.csv", type3, function(data) { 
+
+
+		var axis = d3.axisLeft();
+		var background;
+		var foreground;
+
+		var svg = d3.select('.pc')
+		  .attr("width", w + m[1] + m[3])
+		  .attr("height", h + m[0] + m[2])
+		  .append("svg:g")
+		  .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
+	// Extract the list of dimensions and create a scale for each.
+	x2.domain(dimensions = d3.keys(data[0]).filter(function(d) {
+		if(d == 'left' || d =='department' || d == 'promotion_last_5years' || d == 'Work_accident') {return false;}
+		if(d == 'salary') {
+			y2[d] = d3.scalePoint().domain(data.map(function(p) {
+	      return p[d];
+	    })).range([h, 0]);}
+		else {
+	  y2[d] = d3.scaleLinear().domain([0,d3.max(data, function(p) { return p[d]; })])
+	  	.range([h, 0]); } 
+	  return true;
+	}));
+
+	// Add grey background lines for context.
+	background = svg.append("svg:g")
+	  .attr("class", "background")
+	  .selectAll("path")
+	  .data(data)
+	  .enter().append("svg:path")
+	  .attr("d", path);
+
+	// Add blue foreground lines for focus.
+	foreground = svg.append("svg:g")
+	  .attr("class", "foreground")
+	  .selectAll("path")
+	  .data(data)
+	  .enter().append("svg:path")
+	  .attr("d", path).attr('stroke', function(d) {return d.left == 1? 'orange':'steelblue'});
+
+	// Add a group element for each dimension.
+	var g = svg.selectAll(".dimension")
+	  .data(dimensions)
+	  .enter().append("svg:g")
+	  .attr("class", "dimension")
+	  .attr("transform", function(d) {
+	    return "translate(" + x2(d) + ")";
+	  });
+
+	// Add an axis and title.
+	g.append("svg:g")
+	  .attr("class", "axis")
+	  .each(function(d) {
+	    d3.select(this).call(d3.axisRight(y2[d]));
+	  })
+	  .append("svg:text")
+	  .attr("text-anchor", "middle")
+	  .attr("y", -9)
+	  .text(String);
+	});
+	function position(d) {
+	  var v = dragging[d];
+	  return v == null ? x2(d) : v;
+	}
+
+	function transition(g) {
+	  return g.transition().duration(500);
+	}
+
+	// Returns the path for a given data point.
+	function path(d) {
+	  return line(dimensions.map(function(p) {
+	    return [position(p), y2[p](d[p])];
+	  }));
+	}	
+
+	function type3(d) {
+		d.satisfaction_level = +d.satisfaction_level;
+		d.last_evaluation = +d.last_evaluation;
+		d.number_project = +d.number_project;
+		d.average_monthly_hours = +d.average_monthly_hours;
+		d.time_spend_company = +d.time_spend_company;
+		d.Work_accident = +d.Work_accident;
+		d.left = +d.left;
+		d.promotion_last_5years = +d.promotion_last_5years;
+		return d;
+	}
+
+
+	var min = Infinity,
+	    max = -Infinity;
+d3.csv("data/morley.csv", function(error, csv) {
+	// boxplot
+	var margin = {top: 10, right: 50, bottom: 20, left: 50},
+	    width = 120 - margin.left - margin.right,
+	    height = 500 - margin.top - margin.bottom;
+
+
+	var chart = d3.box()
+	    .whiskers(iqr(1.5))
+	    .width(width)
+	    .height(height);
+  if (error) throw error;
+
+  var data = [];
+
+  csv.forEach(function(x) {
+    var e = Math.floor(x.Expt - 1),
+        r = Math.floor(x.Run - 1),
+        s = Math.floor(x.Speed),
+        d = data[e];
+    if (!d)  d = data[e] = [e+1,s];
+    else d.push(s);
+    if (s > max) max = s;
+    if (s < min) min = s;
+  });
+
+  chart.domain([min, max]);
+  scale1 = d3.scaleBand().domain([1,2,3,4,5]).range([0,550])
+
+  var svg = d3.select(".box1").attr('width', 600).attr('height', 550);
+
+	svg.append("g")
+	.attr("class", "axis")
+	.attr('width',600)
+	.attr("transform", "translate(0," + 500 + ")")
+	.call(d3.axisBottom(scale1));
+      
+  g = svg.selectAll('.mybox').data(data)
+    .enter().append("svg")
+      .attr("class", "box")
+      .attr('x', function(d) { return scale1(d[0]);})
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.bottom + margin.top)
+    .append("g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+      .call(chart);
+
+  // setInterval(function() {
+  //   g.datum(randomize).call(chart.duration(1000));
+  // }, 2000);
+});
+
+function randomize(d) {
+  if (!d.randomizer) d.randomizer = randomizer(d);
+  return d.map(d.randomizer);
+}
+
+function randomizer(d) {
+  var k = d3.max(d) * .02;
+  return function(d) {
+    return Math.max(min, Math.min(max, d + k * (Math.random() - .5)));
+  };
+}
+
+// Returns a function to compute the interquartile range.
+function iqr(k) {
+  return function(d, i) {
+    var q1 = d.quartiles[0],
+        q3 = d.quartiles[2],
+        iqr = (q3 - q1) * k,
+        i = -1,
+        j = d.length;
+    while (d[++i] < q1 - iqr);
+    while (d[--j] > q3 + iqr);
+    return [i, j];
+  };
+}
+
+
+</script>
+
+
 </body>
 </html>
