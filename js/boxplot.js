@@ -65,6 +65,7 @@ d3.csv("data/graph4.csv", function(error, csv) {
 
 	function trans(d) {
 			new_d = data[current].filter(function(x) {if(x[0] == d[0]) return true;});
+			delete d;
 	  	return new_d[0];
 	}
 

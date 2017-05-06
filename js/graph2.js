@@ -16,9 +16,14 @@
 
   			y.domain([0, d3.max(data, function(d) { return d.Count_stayed+d.Count_left; })]);
 
-  			legend = chart2.append('rect')
+  			legend = chart2.append('g').attr('class', 'legend')
   			.attr('transform', 'translate(20,20)')
-  			.attr('width', 30).attr('height', 20).attr('fill','orange');
+  			.attr('width', 50).attr('height', 50);
+
+  			legend.append('rect').attr('fill', 'orange');
+  			legend.append('rect').attr('fill', 'steelblue').attr('y',20);
+  			legend.append('text').text('left').attr('x', 20).attr('y',10);
+  			legend.append('text').text('stayed').attr('x', 20).attr('y',30);
 
 
   			chart2.append("g")

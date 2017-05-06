@@ -26,9 +26,13 @@
 		fill:black;
 	}
 
-	p {
+	p, h2,h3 {
 		margin-left: 5%;
 		margin-right: 40%;
+	}
+
+	p{
+		font-size: 110%;
 	}
 
 svg {
@@ -85,32 +89,44 @@ svg {
   stroke: #ccc;
 }
 
-.legend rect {
-	width: 20px;
-	height: 20px;
-}
+/*.legend rect {
+	width: 15px;
+	height: 15px;
+}*/
  </style>
 
 </head>
 
 <body>
-	<p style="margin-bottom:10px">Employee Leave Rate Per Department</p>
+<h2>Human Resources Analytics</h2>
+<h3>Jianfu Situ</h3>
+
+	<p>I chose a dataset from <a href=https://www.kaggle.com/ludobenistant/hr-analytics>Kaggle</a>. 
+The dataset contains characteristics about employees in a company and whether an employee has left that company. The main goal of the following visualizations is to discover the reason why some employees left and some stayed.</p>
+<p>My initial question about this dataset is whether the leave rate differs among departments of the company. To answer that question, I aggregated the data by department and leave factor, and plotted the number of employees that left over the total number of employees in that department. We can expect some differences in the leave rate because each department would presumably have a distinct work environment that affects an employee's decision to leave.</p>
 	<svg class="chart"></svg>
-	<p>There is a clear difference in leave rate between departments. Employees in human resources are twice as likely to leave as those in management.</p>
-	<p>What is causing people to leave the company? We can use the parallel coordinates technique to see if there's any differences in characterics between those who left and those who stayed.</p>
+	<p>Above is a bar graph depicting the leave rate by department. Using position as a channel for both leave rate and department, we can clearly see a difference in leave rate as expected. Employees in human resources are over twice as likely to leave as those in management.
+</p>
+	<p>In the next visualization, I'd like to shift my focus to just the Human Resources department. Since the department has the highest leave rate, I hope to find  the reasons why employees leave by looking at the characteristics of the employees that left and stayed. To do so, I filter out the other departments and certain irrelevant attributes and plotted the result. 
+</p>
 	<svg class='pc'></svg>
-	<p>Above is the result for the HR department alone, where orange lines are the employees that left, and blue are the ones that stayed.</p>
-	<p>It seems like average monthly hour plays an importment role in the rentention of employees. Let's further explore this attribute with a stacked bar graph to visualize the leave rate by average monthly hour groups.</p>
+	<p>Above is a parallel coordinates map of every Human Resources employee and some of their corresponding characterics. In orange are those that have left, and in blue are those that stayed. Immediately we can identify discrepancies in a few categories. Namely, employees that left tend to have low satisfaction level, too few or too many projects and monthly hours. 
+</p>
+	<p>Naturally, satisfaction level, number of projects, or monthly hours would be a good characteristic to explore further. I chose to go with monthly hours since it seems to have the sharpest contrast. With monthly hours, I'd like to discover any differences in leave count when employees are grouped by monthly hours. 
+</p>
 	<svg class="chart2"></svg>
-	<p></p>
+	<p>In the stacked bar graph above, it's clear that there is a high leave rate among those with too many hours or too little hours. This is consistent with what we found in the human resources department previously. </p>
+	<p>Now that we know monthly hours plays an important role in the retention of employees, let's revisit the first question and see if the difference in leave rate per department can be explained by monthly hours. </p>
 	<svg class='box1'></svg>
+	<p>In this final visualization is a series of boxplots for monthly hours in each department. First we see the boxplots for employees that stayed, and transition to employees that left (here the whiskers represent the min and the max). Boxplots are a great way to summarize and examine groups of similar data, and the transitions are there to enhance that capability.</p>
+
+	<p>For the employees that stayed, the boxplots are almost identical among all departments, with symmetrical upper and lower quartiles around the mean. This suggests a low variability in work hours, with a median of 200 hours per month or roughly 46 per week. On the other hand, the boxplots for employees who left tend to have a median that skews towards the upper quartile, except Marketing and HR which skew towards the lower quartile. We can also see an increase in hours variability across the board. </p>
+	<p>Unfortunately, there doesn't seem to be any trends in the box plots that can offer an explanation for why some department has a higher leave rate than others. Perhaps a further analysis of a different attribute would have been more useful. All in all, we can conclude from the above that there is significant difference in leave rate among departments for unexplained reasons, and having a reasonable work schedule is important for the retention of employees. </p>
 	<script src="js/d3.min.js"></script>
 	<script src="js/box.js"></script>
 	<script src="js/graph1.js"></script>
 	<script src="js/graph2.js"></script>		
 	<script src="js/pc.js"></script>		
 	<script src="js/boxplot.js"></script>
-
-
 </body>
 </html>

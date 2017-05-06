@@ -1,4 +1,4 @@
-	var m = [30, 40, 30, 40],
+	var m = [50, 40, 50, 40],
 	  w = 1300 - m[1] - m[3],
 	  h = 600 - m[0] - m[2];
 	var line = d3.line();
@@ -29,6 +29,15 @@
 	  	.range([h, 0]); } 
 	  return true;
 	}));
+	d3.select('.pc').append('text').text('Human Resources Employees').attr('x',10).attr('y',15);
+		legend = svg.append('g').attr('class', 'legend')
+		.attr('transform', 'translate(35,'+(h-40)+')')
+		.attr('width', 50).attr('height', 50);
+
+		legend.append('rect').attr('fill', 'orange');
+		legend.append('rect').attr('fill', 'steelblue').attr('y',20);
+		legend.append('text').text('left').attr('x', 20).attr('y',10);
+		legend.append('text').text('stayed').attr('x', 20).attr('y',30);
 
 	// Add grey background lines for context.
 	background = svg.append("svg:g")
@@ -59,7 +68,10 @@
 	g.append("svg:g")
 	  .attr("class", "axis")
 	  .each(function(d) {
-	    d3.select(this).call(d3.axisRight(y2[d]));
+	  	if(d == 'number_project' ) { d3.select(this).call(d3.axisRight(y2[d]).tickValues([0,1,2,3,4,5,6,7]).tickFormat(d3.format("d")));}
+	  	else if(d == 'average_monthly_hours' || d == 'time_spend_company') 
+	    {d3.select(this).call(d3.axisRight(y2[d]).tickFormat(d3.format("d")));}
+	  	else {d3.select(this).call(d3.axisRight(y2[d]));}
 	  })
 	  .append("svg:text")
 	  .attr("text-anchor", "middle")
